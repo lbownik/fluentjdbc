@@ -89,23 +89,13 @@ public final class FluentJDBC {
       /***********************************************************************
        * 
        **********************************************************************/
-      private void close() throws SQLException {
-
-         final Connection c = this.s.getConnection();
-         this.s.close();
-         c.close();
-      }
-
-      /***********************************************************************
-       * 
-       **********************************************************************/
       public Preparator set(final byte v) throws SQLException {
 
          try {
             this.s.setByte(++this.paramIndex, v);
             return this;
          } catch (final SQLException e) {
-            close();
+            this.s.close();
             throw e;
          }
       }
@@ -119,7 +109,7 @@ public final class FluentJDBC {
             this.s.setShort(++this.paramIndex, v);
             return this;
          } catch (final SQLException e) {
-            close();
+            this.s.close();
             throw e;
          }
       }
@@ -133,7 +123,7 @@ public final class FluentJDBC {
             this.s.setInt(++this.paramIndex, v);
             return this;
          } catch (final SQLException e) {
-            close();
+            this.s.close();
             throw e;
          }
       }
@@ -147,7 +137,7 @@ public final class FluentJDBC {
             this.s.setLong(++this.paramIndex, v);
             return this;
          } catch (final SQLException e) {
-            close();
+            this.s.close();
             throw e;
          }
       }
@@ -161,7 +151,7 @@ public final class FluentJDBC {
             this.s.setFloat(++this.paramIndex, v);
             return this;
          } catch (final SQLException e) {
-            close();
+            this.s.close();
             throw e;
          }
       }
@@ -175,7 +165,7 @@ public final class FluentJDBC {
             this.s.setDouble(++this.paramIndex, v);
             return this;
          } catch (final SQLException e) {
-            close();
+            this.s.close();
             throw e;
          }
       }
@@ -189,7 +179,7 @@ public final class FluentJDBC {
             this.s.setString(++this.paramIndex, v);
             return this;
          } catch (final SQLException e) {
-            close();
+            this.s.close();
             throw e;
          }
       }
@@ -203,7 +193,7 @@ public final class FluentJDBC {
             this.s.setDate(++this.paramIndex, v);
             return this;
          } catch (final SQLException e) {
-            close();
+            this.s.close();
             throw e;
          }
       }
@@ -217,7 +207,7 @@ public final class FluentJDBC {
             this.s.setBoolean(++this.paramIndex, v);
             return this;
          } catch (final SQLException e) {
-            close();
+            this.s.close();
             throw e;
          }
       }
@@ -231,7 +221,7 @@ public final class FluentJDBC {
             this.s.setBigDecimal(++this.paramIndex, v);
             return this;
          } catch (final SQLException e) {
-            close();
+            this.s.close();
             throw e;
          }
       }
@@ -245,7 +235,7 @@ public final class FluentJDBC {
             this.s.setBytes(++this.paramIndex, v);
             return this;
          } catch (final SQLException e) {
-            close();
+            this.s.close();
             throw e;
          }
       }
@@ -259,7 +249,7 @@ public final class FluentJDBC {
             this.s.setTime(++this.paramIndex, v);
             return this;
          } catch (final SQLException e) {
-            close();
+            this.s.close();
             throw e;
          }
       }
@@ -273,7 +263,7 @@ public final class FluentJDBC {
             this.s.setTimestamp(++this.paramIndex, v);
             return this;
          } catch (final SQLException e) {
-            close();
+            this.s.close();
             throw e;
          }
       }
@@ -287,7 +277,7 @@ public final class FluentJDBC {
             this.s.setObject(++this.paramIndex, v);
             return this;
          } catch (final SQLException e) {
-            close();
+            this.s.close();
             throw e;
          }
       }
@@ -301,7 +291,7 @@ public final class FluentJDBC {
             this.s.setBlob(++this.paramIndex, v);
             return this;
          } catch (final SQLException e) {
-            close();
+            this.s.close();
             throw e;
          }
       }
@@ -315,7 +305,7 @@ public final class FluentJDBC {
             this.s.setClob(++this.paramIndex, v);
             return this;
          } catch (final SQLException e) {
-            close();
+            this.s.close();
             throw e;
          }
       }
@@ -329,7 +319,7 @@ public final class FluentJDBC {
             this.s.setArray(++this.paramIndex, v);
             return this;
          } catch (final SQLException e) {
-            close();
+            this.s.close();
             throw e;
          }
       }
@@ -343,7 +333,7 @@ public final class FluentJDBC {
             this.s.setURL(++this.paramIndex, v);
             return this;
          } catch (final SQLException e) {
-            close();
+            this.s.close();
             throw e;
          }
       }
@@ -357,7 +347,7 @@ public final class FluentJDBC {
             this.s.setRowId(++this.paramIndex, v);
             return this;
          } catch (final SQLException e) {
-            close();
+            this.s.close();
             throw e;
          }
       }
@@ -371,7 +361,7 @@ public final class FluentJDBC {
             this.s.setSQLXML(++this.paramIndex, v);
             return this;
          } catch (final SQLException e) {
-            close();
+            this.s.close();
             throw e;
          }
       }
@@ -384,7 +374,7 @@ public final class FluentJDBC {
          try {
             this.s.executeUpdate();
          } finally {
-            close();
+            this.s.close();
          }
       }
 
@@ -402,7 +392,7 @@ public final class FluentJDBC {
             }
          } finally {
             rset.close();
-            close();
+            this.s.close();
          }
          return result;
       }
@@ -419,7 +409,7 @@ public final class FluentJDBC {
             }
          } finally {
             rset.close();
-            close();
+            this.s.close();
          }
       }
 
@@ -437,7 +427,7 @@ public final class FluentJDBC {
             }
          } finally {
             rset.close();
-            close();
+            this.s.close();
          }
          return accumulator;
       }
