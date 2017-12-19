@@ -1,5 +1,5 @@
 //
-//Copyright (C) 2014 Łukasz Bownik
+//Copyright (C) 2014-2017 Łukasz Bownik
 //
 //Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
 //associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -18,6 +18,7 @@
 package fluentJDBC;
 
 import java.io.InputStream;
+import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Array;
@@ -25,23 +26,26 @@ import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.NClob;
 import java.sql.PreparedStatement;
+import java.sql.Ref;
 import java.sql.ResultSet;
 import java.sql.RowId;
 import java.sql.SQLException;
-import java.sql.SQLWarning;
 import java.sql.SQLXML;
+import static java.sql.Statement.*;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 
 /*******************************************************************************
  *
  * @author lukasz.bownik@gmail.com
  ******************************************************************************/
 public final class FluentJDBC {
-
    /***************************************************************************
     * 
     **************************************************************************/
@@ -52,7 +56,6 @@ public final class FluentJDBC {
       }
       return new FluentJDBC(c);
    }
-
    /***************************************************************************
     * 
     **************************************************************************/
@@ -60,7 +63,15 @@ public final class FluentJDBC {
 
       return new Preparator(this.c.prepareStatement(sql));
    }
+   /***************************************************************************
+    * 
+    **************************************************************************/
+   public Preparator prepare(final String sql, final boolean returnGeneratedKeys)
+           throws SQLException {
 
+      return new Preparator(this.c.prepareStatement(sql,
+              returnGeneratedKeys ? RETURN_GENERATED_KEYS : NO_GENERATED_KEYS));
+   }
    /***************************************************************************
     * 
     **************************************************************************/
@@ -76,7 +87,7 @@ public final class FluentJDBC {
    /***************************************************************************
     * 
     **************************************************************************/
-   public final static class Preparator {
+   public final static class Preparator implements AutoCloseable {
 
       /***********************************************************************
        * 
@@ -85,7 +96,6 @@ public final class FluentJDBC {
 
          this.s = s;
       }
-
       /***********************************************************************
        * 
        **********************************************************************/
@@ -99,7 +109,6 @@ public final class FluentJDBC {
             throw e;
          }
       }
-
       /***********************************************************************
        * 
        **********************************************************************/
@@ -113,7 +122,6 @@ public final class FluentJDBC {
             throw e;
          }
       }
-
       /***********************************************************************
        * 
        **********************************************************************/
@@ -127,7 +135,6 @@ public final class FluentJDBC {
             throw e;
          }
       }
-
       /***********************************************************************
        * 
        **********************************************************************/
@@ -141,7 +148,6 @@ public final class FluentJDBC {
             throw e;
          }
       }
-
       /***********************************************************************
        * 
        **********************************************************************/
@@ -155,7 +161,6 @@ public final class FluentJDBC {
             throw e;
          }
       }
-
       /***********************************************************************
        * 
        **********************************************************************/
@@ -169,7 +174,6 @@ public final class FluentJDBC {
             throw e;
          }
       }
-
       /***********************************************************************
        * 
        **********************************************************************/
@@ -183,7 +187,6 @@ public final class FluentJDBC {
             throw e;
          }
       }
-
       /***********************************************************************
        * 
        **********************************************************************/
@@ -197,7 +200,6 @@ public final class FluentJDBC {
             throw e;
          }
       }
-
       /***********************************************************************
        * 
        **********************************************************************/
@@ -211,7 +213,6 @@ public final class FluentJDBC {
             throw e;
          }
       }
-
       /***********************************************************************
        * 
        **********************************************************************/
@@ -225,7 +226,6 @@ public final class FluentJDBC {
             throw e;
          }
       }
-
       /***********************************************************************
        * 
        **********************************************************************/
@@ -239,7 +239,6 @@ public final class FluentJDBC {
             throw e;
          }
       }
-
       /***********************************************************************
        * 
        **********************************************************************/
@@ -253,7 +252,20 @@ public final class FluentJDBC {
             throw e;
          }
       }
+      /***********************************************************************
+       * 
+       **********************************************************************/
+      public Preparator set(final Time v, final Calendar c)
+              throws SQLException {
 
+         try {
+            this.s.setTime(++this.paramIndex, v, c);
+            return this;
+         } catch (final SQLException e) {
+            this.s.close();
+            throw e;
+         }
+      }
       /***********************************************************************
        * 
        **********************************************************************/
@@ -267,7 +279,6 @@ public final class FluentJDBC {
             throw e;
          }
       }
-
       /***********************************************************************
        * 
        **********************************************************************/
@@ -281,7 +292,6 @@ public final class FluentJDBC {
             throw e;
          }
       }
-
       /***********************************************************************
        * 
        **********************************************************************/
@@ -295,7 +305,6 @@ public final class FluentJDBC {
             throw e;
          }
       }
-
       /***********************************************************************
        * 
        **********************************************************************/
@@ -309,7 +318,19 @@ public final class FluentJDBC {
             throw e;
          }
       }
+      /***********************************************************************
+       * 
+       **********************************************************************/
+      public Preparator set(final NClob v) throws SQLException {
 
+         try {
+            this.s.setNClob(++this.paramIndex, v);
+            return this;
+         } catch (final SQLException e) {
+            this.s.close();
+            throw e;
+         }
+      }
       /***********************************************************************
        * 
        **********************************************************************/
@@ -323,7 +344,32 @@ public final class FluentJDBC {
             throw e;
          }
       }
+      /***********************************************************************
+       * 
+       **********************************************************************/
+      public Preparator set(final Reader v) throws SQLException {
 
+         try {
+            this.s.setCharacterStream(++this.paramIndex, v);
+            return this;
+         } catch (final SQLException e) {
+            this.s.close();
+            throw e;
+         }
+      }
+      /***********************************************************************
+       * 
+       **********************************************************************/
+      public Preparator set(final InputStream v) throws SQLException {
+
+         try {
+            this.s.setBinaryStream(++this.paramIndex, v);
+            return this;
+         } catch (final SQLException e) {
+            this.s.close();
+            throw e;
+         }
+      }
       /***********************************************************************
        * 
        **********************************************************************/
@@ -337,7 +383,6 @@ public final class FluentJDBC {
             throw e;
          }
       }
-
       /***********************************************************************
        * 
        **********************************************************************/
@@ -351,7 +396,6 @@ public final class FluentJDBC {
             throw e;
          }
       }
-
       /***********************************************************************
        * 
        **********************************************************************/
@@ -365,68 +409,137 @@ public final class FluentJDBC {
             throw e;
          }
       }
-
       /***********************************************************************
        * 
        **********************************************************************/
-      public void update() throws SQLException {
+      public Preparator set(final Ref v) throws SQLException {
 
          try {
-            this.s.executeUpdate();
+            this.s.setRef(++this.paramIndex, v);
+            return this;
+         } catch (final SQLException e) {
+            this.s.close();
+            throw e;
+         }
+      }
+      /***********************************************************************
+       * 
+       **********************************************************************/
+      public Preparator set(final Setter setter) throws SQLException {
+
+         try {
+            setter.set(this.s, ++this.paramIndex);
+            return this;
+         } catch (final SQLException e) {
+            this.s.close();
+            throw e;
+         }
+      }
+      /***********************************************************************
+       * 
+       **********************************************************************/
+      public Preparator apply(final Consumer<PreparedStatement, SQLException> consumer)
+              throws SQLException {
+
+         try {
+            consumer.consume(this.s);
+            return this;
+         } catch (final SQLException e) {
+            this.s.close();
+            throw e;
+         }
+      }
+      /***********************************************************************
+       * 
+       **********************************************************************/
+      public int andUpdate() throws SQLException {
+
+         try {
+            return this.s.executeUpdate();
          } finally {
             this.s.close();
          }
       }
-
       /***********************************************************************
        * 
        **********************************************************************/
-      public <T> List<T> mapQuery(final RSetFunction<T> mapper)
-              throws SQLException {
+      public Object andUpdateReturningKey() throws SQLException {
 
-         final ArrayList<T> result = new ArrayList<>();
-         final RSet rset = new RSet(this.s.executeQuery());
          try {
-            while (rset.next()) {
-               result.add(mapper.apply(rset));
+            this.s.executeUpdate();
+            try (final ResultSet rs = this.s.getGeneratedKeys()) {
+               rs.next();
+               return rs.getObject(1);
             }
          } finally {
-            rset.close();
+            this.s.close();
+         }
+      }
+      /***********************************************************************
+       * 
+       **********************************************************************/
+      public <T> List<T> andMap(final Mapper<T> mapper)
+              throws Exception {
+
+         return andMap(10, mapper);
+      }
+      /***********************************************************************
+       * 
+       **********************************************************************/
+      public <T> List<T> andMap(final int size, final Mapper<T> mapper)
+              throws Exception {
+
+         final ArrayList<T> result = new ArrayList<>(size);
+         try (final ResultSet rs = this.s.executeQuery()) {
+            while (rs.next()) {
+               result.add(mapper.map(rs));
+            }
+         } finally {
             this.s.close();
          }
          return result;
       }
-
       /***********************************************************************
        * 
        **********************************************************************/
-      public void forEachQuery(final RSetConsumer c) throws SQLException {
+      public <T> Optional<T> andMapOne(final Mapper<T> mapper)
+              throws Exception {
 
-         final RSet rset = new RSet(this.s.executeQuery());
-         try {
-            while (rset.next()) {
-               c.accept(rset);
+         try (final ResultSet rs = this.s.executeQuery()) {
+            if (rs.next()) {
+               return Optional.of(mapper.map(rs));
+            } else {
+               return Optional.empty();
             }
          } finally {
-            rset.close();
             this.s.close();
          }
       }
-
       /***********************************************************************
        * 
        **********************************************************************/
-      public <T> T foldQuery(final T seed, final RSetBiFunction<T> reducer)
-              throws SQLException {
+      public void andForEach(final Consumer<ResultSet, Exception> consumer) 
+              throws Exception {
 
-         T accumulator = seed;
-         final RSet rset = new RSet(this.s.executeQuery());
-         try {
-            while (rset.next()) {
-               accumulator = reducer.apply(accumulator, rset);
+         try (final ResultSet rs = this.s.executeQuery()) {
+            while (rs.next()) {
+               consumer.consume(rs);
             }
          } finally {
-            rset.close();
+            this.s.close();
+         }
+      }
+      /***********************************************************************
+       * 
+       **********************************************************************/
+      public <T> T andReduce(T accumulator, final Reducer<T> reducer)
+              throws Exception {
+
+         try (final ResultSet rs = this.s.executeQuery()) {
+            while (rs.next()) {
+               accumulator = reducer.reduce(accumulator, rs);
+            }
+         } finally {
             this.s.close();
          }
          return accumulator;
@@ -434,226 +547,56 @@ public final class FluentJDBC {
       /***********************************************************************
        * 
        **********************************************************************/
+      public void close() throws Exception {
+
+         this.s.close();
+      }
+      /***********************************************************************
+       * 
+       **********************************************************************/
       private final PreparedStatement s;
       private int paramIndex = 0;
    }
-
    /***************************************************************************
     * 
     **************************************************************************/
-   public final static class RSet {
+   public interface Mapper<T> {
 
       /***********************************************************************
        * 
        **********************************************************************/
-      private RSet(final ResultSet rs) {
-
-         this.rs = rs;
-      }
-
-      /***********************************************************************
-       * 
-       **********************************************************************/
-      public byte getByte() throws SQLException {
-
-         return this.rs.getByte(++this.columnIndex);
-      }
-
-      /***********************************************************************
-       * 
-       **********************************************************************/
-      public short getShort() throws SQLException {
-
-         return this.rs.getShort(++this.columnIndex);
-      }
-
-      /***********************************************************************
-       * 
-       **********************************************************************/
-      public int getInt() throws SQLException {
-
-         return this.rs.getInt(++this.columnIndex);
-      }
-
-      /***********************************************************************
-       * 
-       **********************************************************************/
-      public long getLong() throws SQLException {
-
-         return this.rs.getLong(++this.columnIndex);
-      }
-
-      /***********************************************************************
-       * 
-       **********************************************************************/
-      public float getFloat() throws SQLException {
-
-         return this.rs.getFloat(++this.columnIndex);
-      }
-
-      /***********************************************************************
-       * 
-       **********************************************************************/
-      public double getDouble() throws SQLException {
-
-         return this.rs.getDouble(++this.columnIndex);
-      }
-
-      /***********************************************************************
-       * 
-       **********************************************************************/
-      public String getString() throws SQLException {
-
-         return this.rs.getString(++this.columnIndex);
-      }
-
-      /***********************************************************************
-       * 
-       **********************************************************************/
-      public Date getDate() throws SQLException {
-
-         return this.rs.getDate(++this.columnIndex);
-      }
-
-      /***********************************************************************
-       * 
-       **********************************************************************/
-      public boolean getBoolean() throws SQLException {
-
-         return this.rs.getBoolean(++this.columnIndex);
-      }
-
-      /***********************************************************************
-       * 
-       **********************************************************************/
-      public Object getObject() throws SQLException {
-
-         return this.rs.getObject(++this.columnIndex);
-      }
-
-      /***********************************************************************
-       * 
-       **********************************************************************/
-      public byte[] getBytes() throws SQLException {
-
-         return this.rs.getBytes(++this.columnIndex);
-      }
-
-      /***********************************************************************
-       * 
-       **********************************************************************/
-      public Time getTime() throws SQLException {
-
-         return this.rs.getTime(++this.columnIndex);
-      }
-
-      /***********************************************************************
-       * 
-       **********************************************************************/
-      public Timestamp getTimestamp() throws SQLException {
-
-         return this.rs.getTimestamp(++this.columnIndex);
-      }
-      /***********************************************************************
-       * 
-       **********************************************************************/
-      public InputStream getAsciiStream() throws SQLException {
-
-         return this.rs.getAsciiStream(++this.columnIndex);
-      }
-      /***********************************************************************
-       * 
-       **********************************************************************/
-      public InputStream getBinaryStream() throws SQLException {
-
-         return this.rs.getBinaryStream(++this.columnIndex);
-      }
-      /***********************************************************************
-       * 
-       **********************************************************************/
-      public BigDecimal getBigDecimal() throws SQLException {
-
-         return this.rs.getBigDecimal(++this.columnIndex);
-      }
-      /***********************************************************************
-       * 
-       **********************************************************************/
-      public SQLWarning getWarnings() throws SQLException {
-
-         return this.rs.getWarnings();
-      }
-      /***********************************************************************
-       * 
-       **********************************************************************/
-      public void clearWarnings() throws SQLException {
-
-         this.rs.clearWarnings();
-      }
-
-      /***********************************************************************
-       * 
-       **********************************************************************/
-      private boolean next() throws SQLException {
-
-         this.columnIndex = 0;
-         return this.rs.next();
-      }
-
-      /***********************************************************************
-       * 
-       **********************************************************************/
-      private void close() throws SQLException {
-
-         this.rs.close();
-      }
-
-      /***********************************************************************
-       * 
-       **********************************************************************/
-      private boolean wasNull() throws SQLException {
-
-         return this.rs.wasNull();
-      }
-      /***********************************************************************
-       * 
-       **********************************************************************/
-      private final ResultSet rs;
-      private int columnIndex = 0;
+      T map(ResultSet rs) throws Exception;
    }
 
    /***************************************************************************
     * 
     **************************************************************************/
-   @FunctionalInterface
-   public interface RSetFunction<R> {
+   public interface Consumer<T, E extends Throwable> {
 
       /***********************************************************************
        * 
        **********************************************************************/
-      R apply(RSet rs) throws SQLException;
+      void consume(T o) throws E;
    }
 
    /***************************************************************************
     * 
     **************************************************************************/
-   @FunctionalInterface
-   public interface RSetConsumer {
+   public interface Reducer<T> {
 
       /***********************************************************************
        * 
        **********************************************************************/
-      void accept(RSet rs) throws SQLException;
+      T reduce(T seed, ResultSet rs) throws Exception;
    }
-
    /***************************************************************************
     * 
     **************************************************************************/
-   @FunctionalInterface
-   public interface RSetBiFunction<T> {
+   public interface Setter {
 
       /***********************************************************************
        * 
        **********************************************************************/
-      T apply(T seed, RSet rs) throws SQLException;
+      void set(PreparedStatement s, int index) throws SQLException;
    }
 }
