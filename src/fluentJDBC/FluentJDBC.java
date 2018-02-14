@@ -507,9 +507,9 @@ public final class FluentJDBC {
 
          try (final ResultSet rs = this.s.executeQuery()) {
             if (rs.next()) {
-               return Optional.of(mapper.map(rs));
+               return Optional.<T>of(mapper.map(rs));
             } else {
-               return Optional.empty();
+               return Optional.<T>empty();
             }
          } finally {
             this.s.close();
@@ -518,7 +518,7 @@ public final class FluentJDBC {
       /***********************************************************************
        * 
        **********************************************************************/
-      public void andForEach(final Consumer<ResultSet, Exception> consumer) 
+      public void andForEach(final Consumer<ResultSet, Exception> consumer)
               throws Exception {
 
          try (final ResultSet rs = this.s.executeQuery()) {

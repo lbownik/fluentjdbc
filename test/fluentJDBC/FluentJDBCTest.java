@@ -566,5 +566,21 @@ public class FluentJDBCTest {
    /***************************************************************************
     * 
     **************************************************************************/
+   @Test
+   public void test_apply_proper_consumerCalled() throws Exception {
+
+      final AtomicBoolean consumerCalled = new AtomicBoolean();
+      try {
+         using(this.c).prepare("sql").apply((s) -> consumerCalled.getAndSet(true));
+      } catch (Exception e) {
+         assertTrue(consumerCalled.get());
+         assertEquals("sql", this.c.s.sql);
+         assertEquals(0, this.c.s.arguments.size());
+         assertTrue(this.c.s.isClosed);
+      }
+   }
+   /***************************************************************************
+    * 
+    **************************************************************************/
    private final FakeConnection c = new FakeConnection();
 }
