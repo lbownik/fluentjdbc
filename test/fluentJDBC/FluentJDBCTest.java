@@ -53,9 +53,7 @@ public class FluentJDBCTest {
       int result = using(this.c).prepare("sql").andUpdate();
 
       assertEquals(1, result);
-      assertEquals("sql", this.c.s.sql);
-      assertTrue(this.c.s.executeUpdateCalled);
-      assertTrue(this.c.s.isClosed);
+      assertUpdateInvariants();
    }
    /***************************************************************************
     * 
@@ -69,9 +67,7 @@ public class FluentJDBCTest {
          using(this.c).prepare("sql").andUpdate();
          fail();
       } catch (Exception e) {
-         assertEquals("sql", this.c.s.sql);
-         assertTrue(this.c.s.executeUpdateCalled);
-         assertTrue(this.c.s.isClosed);
+         assertUpdateInvariants();
       }
    }
    /***************************************************************************
@@ -83,10 +79,8 @@ public class FluentJDBCTest {
 
       Object key = using(this.c).prepare("sql", true).andUpdateReturningKey();
 
+      assertUpdateInvariants();
       assertEquals("key1", key);
-      assertEquals("sql", this.c.s.sql);
-      assertTrue(this.c.s.executeUpdateCalled);
-      assertTrue(this.c.s.isClosed);
       assertTrue(this.c.s.generatedKeys.nextCalled);
       assertTrue(this.c.s.generatedKeys.isClosed);
    }
@@ -103,9 +97,7 @@ public class FluentJDBCTest {
          using(this.c).prepare("sql", true).andUpdateReturningKey();
          fail();
       } catch (Exception e) {
-         assertEquals("sql", this.c.s.sql);
-         assertTrue(this.c.s.executeUpdateCalled);
-         assertTrue(this.c.s.isClosed);
+         assertUpdateInvariants();
       }
    }
    /***************************************************************************
@@ -121,9 +113,7 @@ public class FluentJDBCTest {
          using(this.c).prepare("sql", true).andUpdateReturningKey();
          fail();
       } catch (Exception e) {
-         assertEquals("sql", this.c.s.sql);
-         assertTrue(this.c.s.executeUpdateCalled);
-         assertTrue(this.c.s.isClosed);
+         assertUpdateInvariants();
       }
    }
    /***************************************************************************
@@ -139,9 +129,7 @@ public class FluentJDBCTest {
          using(this.c).prepare("sql", true).andUpdateReturningKey();
          fail();
       } catch (Exception e) {
-         assertEquals("sql", this.c.s.sql);
-         assertTrue(this.c.s.executeUpdateCalled);
-         assertTrue(this.c.s.isClosed);
+         assertUpdateInvariants();
          assertTrue(this.c.s.generatedKeys.nextCalled);
          assertTrue(this.c.s.generatedKeys.isClosed);
       }
@@ -156,12 +144,8 @@ public class FluentJDBCTest {
 
       using(this.c).prepare("sql").andForEach(rs -> consumerCalled.getAndSet(true));
 
+      assertProperQueryInvariants();
       assertTrue(consumerCalled.getAndSet(true));
-      assertEquals("sql", this.c.s.sql);
-      assertTrue(this.c.s.executeQueryCalled);
-      assertTrue(this.c.s.isClosed);
-      assertTrue(this.c.s.rs.nextCalled);
-      assertTrue(this.c.s.rs.isClosed);
    }
    /***************************************************************************
     * 
@@ -175,11 +159,7 @@ public class FluentJDBCTest {
          });
          fail();
       } catch (Exception e) {
-         assertEquals("sql", this.c.s.sql);
-         assertTrue(this.c.s.executeQueryCalled);
-         assertTrue(this.c.s.isClosed);
-         assertTrue(this.c.s.rs.nextCalled);
-         assertTrue(this.c.s.rs.isClosed);
+         assertProperQueryInvariants();
       }
    }
    /***************************************************************************
@@ -194,10 +174,7 @@ public class FluentJDBCTest {
          });
          fail();
       } catch (Exception e) {
-         assertEquals("sql", this.c.s.sql);
-         assertTrue(this.c.s.executeQueryCalled);
-         assertTrue(this.c.s.isClosed);
-         assertFalse(this.c.s.rs.nextCalled);
+         assertFailedQueryInvariants();
       }
    }
    /***************************************************************************
@@ -210,11 +187,7 @@ public class FluentJDBCTest {
          using(this.c).prepare("sql").andForEach(null);
          fail();
       } catch (NullPointerException e) {
-         assertEquals("sql", this.c.s.sql);
-         assertTrue(this.c.s.executeQueryCalled);
-         assertTrue(this.c.s.isClosed);
-         assertTrue(this.c.s.rs.nextCalled);
-         assertTrue(this.c.s.rs.isClosed);
+         assertProperQueryInvariants();
       }
    }
    /***************************************************************************
@@ -231,14 +204,10 @@ public class FluentJDBCTest {
                  return "result";
               });
 
+      assertProperQueryInvariants();
       assertTrue(mapperCalled.getAndSet(true));
       assertEquals(1, result.size());
       assertEquals("result", result.get(0));
-      assertEquals("sql", this.c.s.sql);
-      assertTrue(this.c.s.executeQueryCalled);
-      assertTrue(this.c.s.isClosed);
-      assertTrue(this.c.s.rs.nextCalled);
-      assertTrue(this.c.s.rs.isClosed);
    }
    /***************************************************************************
     * 
@@ -250,11 +219,7 @@ public class FluentJDBCTest {
          using(this.c).prepare("sql").andMap(null);
          fail();
       } catch (NullPointerException e) {
-         assertEquals("sql", this.c.s.sql);
-         assertTrue(this.c.s.executeQueryCalled);
-         assertTrue(this.c.s.isClosed);
-         assertTrue(this.c.s.rs.nextCalled);
-         assertTrue(this.c.s.rs.isClosed);
+         assertProperQueryInvariants();
       }
    }
    /***************************************************************************
@@ -269,11 +234,7 @@ public class FluentJDBCTest {
          });
          fail();
       } catch (Exception e) {
-         assertEquals("sql", this.c.s.sql);
-         assertTrue(this.c.s.executeQueryCalled);
-         assertTrue(this.c.s.isClosed);
-         assertTrue(this.c.s.rs.nextCalled);
-         assertTrue(this.c.s.rs.isClosed);
+         assertProperQueryInvariants();
       }
    }
    /***************************************************************************
@@ -287,10 +248,7 @@ public class FluentJDBCTest {
          using(this.c).prepare("sql").andMap(rs -> "");
          fail();
       } catch (Exception e) {
-         assertEquals("sql", this.c.s.sql);
-         assertTrue(this.c.s.executeQueryCalled);
-         assertTrue(this.c.s.isClosed);
-         assertFalse(this.c.s.rs.nextCalled);
+         assertFailedQueryInvariants();
       }
    }
    /***************************************************************************
@@ -307,14 +265,10 @@ public class FluentJDBCTest {
                  return "result";
               });
 
+      assertProperQueryInvariants();
       assertTrue(mapperCalled.getAndSet(true));
       assertTrue(result.isPresent());
       assertEquals("result", result.get());
-      assertEquals("sql", this.c.s.sql);
-      assertTrue(this.c.s.executeQueryCalled);
-      assertTrue(this.c.s.isClosed);
-      assertTrue(this.c.s.rs.nextCalled);
-      assertTrue(this.c.s.rs.isClosed);
    }
    /***************************************************************************
     * 
@@ -331,13 +285,9 @@ public class FluentJDBCTest {
                  return "result";
               });
 
+      assertProperQueryInvariants();
       assertFalse(mapperCalled.getAndSet(true));
       assertFalse(result.isPresent());
-      assertEquals("sql", this.c.s.sql);
-      assertTrue(this.c.s.executeQueryCalled);
-      assertTrue(this.c.s.isClosed);
-      assertTrue(this.c.s.rs.nextCalled);
-      assertTrue(this.c.s.rs.isClosed);
    }
    /***************************************************************************
     * 
@@ -349,11 +299,7 @@ public class FluentJDBCTest {
          using(this.c).prepare("sql").andMapOne(null);
          fail();
       } catch (NullPointerException e) {
-         assertEquals("sql", this.c.s.sql);
-         assertTrue(this.c.s.executeQueryCalled);
-         assertTrue(this.c.s.isClosed);
-         assertTrue(this.c.s.rs.nextCalled);
-         assertTrue(this.c.s.rs.isClosed);
+         assertProperQueryInvariants();
       }
    }
    /***************************************************************************
@@ -368,11 +314,7 @@ public class FluentJDBCTest {
          });
          fail();
       } catch (Exception e) {
-         assertEquals("sql", this.c.s.sql);
-         assertTrue(this.c.s.executeQueryCalled);
-         assertTrue(this.c.s.isClosed);
-         assertTrue(this.c.s.rs.nextCalled);
-         assertTrue(this.c.s.rs.isClosed);
+         assertProperQueryInvariants();
       }
    }
    /***************************************************************************
@@ -386,10 +328,7 @@ public class FluentJDBCTest {
          using(this.c).prepare("sql").andMapOne(rs -> "");
          fail();
       } catch (Exception e) {
-         assertEquals("sql", this.c.s.sql);
-         assertTrue(this.c.s.executeQueryCalled);
-         assertTrue(this.c.s.isClosed);
-         assertFalse(this.c.s.rs.nextCalled);
+         assertFailedQueryInvariants();
       }
    }
    /***************************************************************************
@@ -405,12 +344,8 @@ public class FluentJDBCTest {
                          return acc;
                       });
 
+      assertProperQueryInvariants();
       assertEquals("result", result.toString());
-      assertEquals("sql", this.c.s.sql);
-      assertTrue(this.c.s.executeQueryCalled);
-      assertTrue(this.c.s.isClosed);
-      assertTrue(this.c.s.rs.nextCalled);
-      assertTrue(this.c.s.rs.isClosed);
    }
    /***************************************************************************
     * 
@@ -422,11 +357,7 @@ public class FluentJDBCTest {
          using(this.c).prepare("sql").andReduce(new StringBuilder(), null);
          fail();
       } catch (NullPointerException e) {
-         assertEquals("sql", this.c.s.sql);
-         assertTrue(this.c.s.executeQueryCalled);
-         assertTrue(this.c.s.isClosed);
-         assertTrue(this.c.s.rs.nextCalled);
-         assertTrue(this.c.s.rs.isClosed);
+         assertProperQueryInvariants();
       }
    }
    /***************************************************************************
@@ -444,13 +375,9 @@ public class FluentJDBCTest {
                  return acc;
               });
 
+      assertProperQueryInvariants();
       assertTrue(reducerCalled.get());
       assertNull(result);
-      assertEquals("sql", this.c.s.sql);
-      assertTrue(this.c.s.executeQueryCalled);
-      assertTrue(this.c.s.isClosed);
-      assertTrue(this.c.s.rs.nextCalled);
-      assertTrue(this.c.s.rs.isClosed);
    }
    /***************************************************************************
     * 
@@ -465,18 +392,14 @@ public class FluentJDBCTest {
                  });
          fail();
       } catch (Exception e) {
-         assertEquals("sql", this.c.s.sql);
-         assertTrue(this.c.s.executeQueryCalled);
-         assertTrue(this.c.s.isClosed);
-         assertTrue(this.c.s.rs.nextCalled);
-         assertTrue(this.c.s.rs.isClosed);
+         assertProperQueryInvariants();
       }
    }
    /***************************************************************************
     * 
     **************************************************************************/
    @Test
-   public void test_andReduce_proper_executeQuerryThrowsException() throws Exception {
+   public void test_andReduce_proper_executeQueryThrowsException() throws Exception {
 
       this.c.s.executeQueryThrowsException = true;
       try {
@@ -484,10 +407,7 @@ public class FluentJDBCTest {
                  (acc, rs) -> acc);
          fail();
       } catch (Exception e) {
-         assertEquals("sql", this.c.s.sql);
-         assertTrue(this.c.s.executeQueryCalled);
-         assertTrue(this.c.s.isClosed);
-         assertFalse(this.c.s.rs.nextCalled);
+         assertFailedQueryInvariants();
       }
    }
    /***************************************************************************
@@ -540,7 +460,9 @@ public class FluentJDBCTest {
    public void test_setWithSetter_proper_setterThrowsException() throws Exception {
 
       try {
-         using(this.c).prepare("sql").set((s, index) -> {throw new SQLException();});
+         using(this.c).prepare("sql").set((s, index) -> {
+            throw new SQLException();
+         });
          fail();
       } catch (Exception e) {
          assertEquals("sql", this.c.s.sql);
@@ -555,7 +477,9 @@ public class FluentJDBCTest {
    public void test_apply_proper_consumerThrowsException() throws Exception {
 
       try {
-         using(this.c).prepare("sql").apply((s) -> {throw new SQLException();});
+         using(this.c).prepare("sql").apply((s) -> {
+            throw new SQLException();
+         });
          fail();
       } catch (Exception e) {
          assertEquals("sql", this.c.s.sql);
@@ -578,6 +502,36 @@ public class FluentJDBCTest {
          assertEquals(0, this.c.s.arguments.size());
          assertTrue(this.c.s.isClosed);
       }
+   }
+   /***************************************************************************
+    * 
+    **************************************************************************/
+   private void assertUpdateInvariants() {
+
+      assertEquals("sql", this.c.s.sql);
+      assertTrue(this.c.s.executeUpdateCalled);
+      assertTrue(this.c.s.isClosed);
+   }
+   /***************************************************************************
+    * 
+    **************************************************************************/
+   private void assertProperQueryInvariants() {
+
+      assertEquals("sql", this.c.s.sql);
+      assertTrue(this.c.s.executeQueryCalled);
+      assertTrue(this.c.s.rs.nextCalled);
+      assertTrue(this.c.s.rs.isClosed);
+      assertTrue(this.c.s.isClosed);
+   }
+   /***************************************************************************
+    * 
+    **************************************************************************/
+   private void assertFailedQueryInvariants() {
+
+      assertEquals("sql", this.c.s.sql);
+      assertTrue(this.c.s.executeQueryCalled);
+      assertFalse(this.c.s.rs.nextCalled);
+      assertTrue(this.c.s.isClosed);
    }
    /***************************************************************************
     * 
