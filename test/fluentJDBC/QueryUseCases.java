@@ -1,6 +1,6 @@
 package fluentJDBC;
 
-import static fluentJDBC.FluentJDBC.using;
+import static fluentJDBC.FluentConnection.using;
 import fluentJDBC.fakes.FakeConnection;
 import java.util.List;
 import java.util.Optional;

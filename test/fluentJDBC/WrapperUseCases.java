@@ -18,7 +18,7 @@
 package fluentJDBC;
 
 import org.junit.Test;
-import static fluentJDBC.FluentJDBC.using;
+import static fluentJDBC.FluentConnection.using;
 import fluentJDBC.fakes.FakeConnection;
 import static org.junit.Assert.*;
 
@@ -35,7 +35,7 @@ public class WrapperUseCases {
    public void using_ReturnsResult_ForProperInvocation()
            throws Exception {
 
-      FluentJDBC wrapper = using(this.c);
+      FluentConnection wrapper = using(this.c);
 
       assertTrue(wrapper.unwrap()== this.c);
    }

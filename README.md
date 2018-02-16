@@ -27,13 +27,13 @@ List<User> list = new ArrayList<>();
         }
     }
 ```
-With Java 8’s lambda expressions and FluentJDBC wrapper this code can be delimited even further to something like this.
+With Java 8’s lambda expressions and FluentConnection wrapper this code can be delimited even further to something like this.
 ```
 List<User> list2 = using(c).prepare("select name, password from users where name = ?").
               set("Adam").andMap(rs -> new User(rs.getString(1), rs.getString(2)));
 ```
-The wrapper uses static imports (in form of `import static fluentJDBC.FluentJDBC.*;`), *fluent method chaining*,  with *implicit parameter index incrementation* and *functional interfaces* which allow lambda expression as parameters to andMap, andReduse and forEach methods.
-Other examples of FluentJDBC uage:
+The wrapper uses static imports (in form of `import static fluentJDBC.FluentConnection.*;`), *fluent method chaining*,  with *implicit parameter index incrementation* and *functional interfaces* which allow lambda expression as parameters to andMap, andReduse and forEach methods.
+Other examples of FluentConnection uage:
 ```
 //FluentJDBC - single value retrieval
 Optional<User> user = using(c).prepare("select name, password from users where name = ?").
@@ -65,5 +65,5 @@ using(c).prepare("insert into users values (?,?,?)").set(1).
 	set("Adam").set("password").
 	apply((s) -> s.setCursorName("c1")).andUpdate();
 ```
-FluentJDBC is a BSD licensed, single file (FluentJDBC.java), lightweight wrapper that You can include in Your project and use. It is by no means a complete JDBC wrapper, but I encourage You to extend it to meet Your own needs.
+FluentJDBC is a BSD licensed, single file (FluentConnection.java), lightweight wrapper that You can include in Your project and use. It is by no means a complete JDBC wrapper, but I encourage You to extend it to meet Your own needs.
 

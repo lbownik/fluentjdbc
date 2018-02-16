@@ -17,7 +17,7 @@
 //SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 package fluentJDBC;
 
-import static fluentJDBC.FluentJDBC.using;
+import static fluentJDBC.FluentConnection.using;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

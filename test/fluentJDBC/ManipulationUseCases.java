@@ -1,6 +1,6 @@
 package fluentJDBC;
 
-import static fluentJDBC.FluentJDBC.using;
+import static fluentJDBC.FluentConnection.using;
 import fluentJDBC.fakes.FakeConnection;
 import java.sql.SQLException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -22,11 +22,12 @@ public class ManipulationUseCases {
    public void setInt_PassesArgumentsToStatement_ForProperInvocation()
            throws Exception {
 
-      using(this.c).prepare("sql").set(13);
+      using(this.c).prepare("sql").set(13).set(14);
 
       assertEquals("sql", this.c.s.sql);
-      assertEquals(1, this.c.s.arguments.size());
+      assertEquals(2, this.c.s.arguments.size());
       assertEquals(13, this.c.s.arguments.get(1));
+      assertEquals(14, this.c.s.arguments.get(2));
       assertFalse(this.c.s.isClosed);
    }
    /***************************************************************************
@@ -69,7 +70,7 @@ public class ManipulationUseCases {
            throws Exception {
 
       try {
-         using(this.c).prepare("sql").set((FluentJDBC.Setter) null);
+         using(this.c).prepare("sql").set((FluentConnection.Setter) null);
          fail();
       } catch (NullPointerException e) {
          assertEquals("sql", this.c.s.sql);

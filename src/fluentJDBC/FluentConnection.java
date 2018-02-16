@@ -340,15 +340,8 @@ public final class FluentConnection {
       public <T> List<T> andMap(final int size, final Mapper<T> mapper)
               throws Exception {
 
-         final ArrayList<T> result = new ArrayList<>(size);
-         try (final ResultSet rs = this.statement.executeQuery()) {
-            while (rs.next()) {
-               result.add(mapper.map(rs));
-            }
-         } finally {
-            this.statement.close();
-         }
-         return result;
+         return andReduce(new ArrayList<>(size), 
+                 (list, rs) -> { list.add(mapper.map(rs)); return list;});
       }
       /***********************************************************************
        * 
@@ -356,15 +349,7 @@ public final class FluentConnection {
       public <T> Optional<T> andMapOne(final Mapper<T> mapper)
               throws Exception {
 
-         try (final ResultSet rs = this.statement.executeQuery()) {
-            if (rs.next()) {
-               return Optional.<T>of(mapper.map(rs));
-            } else {
-               return Optional.<T>empty();
-            }
-         } finally {
-            this.statement.close();
-         }
+         return andReduce(Optional.empty(), (s, rs) -> Optional.of(mapper.map(rs)));
       }
       /***********************************************************************
        * 
@@ -372,13 +357,7 @@ public final class FluentConnection {
       public void andForEach(final Consumer<ResultSet, Exception> consumer)
               throws Exception {
 
-         try (final ResultSet rs = this.statement.executeQuery()) {
-            while (rs.next()) {
-               consumer.consume(rs);
-            }
-         } finally {
-            this.statement.close();
-         }
+         andReduce(null, (seed, rs) -> {consumer.consume(rs); return null;});
       }
       /***********************************************************************
        * 
