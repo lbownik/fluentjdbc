@@ -15,7 +15,7 @@
 //IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
 //HETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
 //SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-package fluentJDBC;
+package fluentJDBC.fakes;
 
 import java.sql.Array;
 import java.sql.Blob;
@@ -46,7 +46,7 @@ public class FakeConnection implements Connection {
    /***************************************************************************
     * 
     **************************************************************************/
-   FakeConnection() {
+   public FakeConnection() {
 
       this.s = new FakeStatement();
    }

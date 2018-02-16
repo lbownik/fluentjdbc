@@ -75,6 +75,13 @@ public final class FluentJDBC {
    /***************************************************************************
     * 
     **************************************************************************/
+   public Connection unwrap() {
+      
+      return this.c;
+   }
+   /***************************************************************************
+    * 
+    **************************************************************************/
    private FluentJDBC(final Connection c) {
 
       this.c = c;
@@ -425,7 +432,7 @@ public final class FluentJDBC {
       /***********************************************************************
        * 
        **********************************************************************/
-      public Preparator set(final Setter setter) throws SQLException {
+      public Preparator set(final Setter setter) throws Exception {
 
          try {
             setter.set(this.s, ++this.paramIndex);
@@ -597,6 +604,6 @@ public final class FluentJDBC {
       /***********************************************************************
        * 
        **********************************************************************/
-      void set(PreparedStatement s, int index) throws SQLException;
+      void set(PreparedStatement s, int index) throws Exception;
    }
 }
