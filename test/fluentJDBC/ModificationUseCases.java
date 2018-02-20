@@ -47,7 +47,7 @@ public class ModificationUseCases {
    public void andUpdateReturningKey_ReturnGeneratedKey_ForProperInvocation()
            throws Exception {
 
-      Object key = using(this.c).prepare("sql", true).andUpdateReturningKey();
+      Object key = using(this.c).prepareWithKey("sql").andUpdateReturningKey();
 
       assertUpdateInvariants();
       assertEquals("key1", key);
@@ -64,7 +64,7 @@ public class ModificationUseCases {
       this.c.s.executeUpdateThrowsException = true;
 
       try {
-         using(this.c).prepare("sql", true).andUpdateReturningKey();
+         using(this.c).prepareWithKey("sql").andUpdateReturningKey();
          fail();
       } catch (Exception e) {
          assertUpdateInvariants();
@@ -80,7 +80,7 @@ public class ModificationUseCases {
       this.c.s.getGeneratedKeysThrowsException = true;
 
       try {
-         using(this.c).prepare("sql", true).andUpdateReturningKey();
+         using(this.c).prepareWithKey("sql").andUpdateReturningKey();
          fail();
       } catch (Exception e) {
          assertUpdateInvariants();
@@ -96,7 +96,7 @@ public class ModificationUseCases {
       this.c.s.generatedKeys.getObjectThrowsException = true;
 
       try {
-         using(this.c).prepare("sql", true).andUpdateReturningKey();
+         using(this.c).prepareWithKey("sql").andUpdateReturningKey();
          fail();
       } catch (Exception e) {
          assertUpdateInvariants();

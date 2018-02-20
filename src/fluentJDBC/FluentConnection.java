@@ -33,7 +33,7 @@ import java.sql.ResultSet;
 import java.sql.RowId;
 import java.sql.SQLException;
 import java.sql.SQLXML;
-import static java.sql.Statement.*;
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -66,11 +66,10 @@ public final class FluentConnection {
    /***************************************************************************
     * 
     **************************************************************************/
-   public Preparator prepare(final String sql, final boolean returnGeneratedKeys)
+   public Preparator prepareWithKey(final String sql)
            throws SQLException {
 
-      return new Preparator(this.c.prepareStatement(sql,
-              returnGeneratedKeys ? RETURN_GENERATED_KEYS : NO_GENERATED_KEYS));
+      return new Preparator(this.c.prepareStatement(sql,RETURN_GENERATED_KEYS));
    }
    /***************************************************************************
     * 
