@@ -35,6 +35,8 @@ List<User> list2 = using(c).prepare("select name, password from users where name
 The wrapper uses static imports (in form of `import static fluentJDBC.FluentConnection.*;`), *fluent method chaining*,  with *implicit parameter index incrementation* and *functional interfaces* which allow lambda expression as parameters to andMap, andReduse and forEach methods.
 Other examples of FluentConnection uage:
 ```
+Connection c = null; // we surely should have initializeded this :)
+
 //FluentJDBC - single value retrieval
 Optional<User> user = using(c).prepare("select name, password from users where name = ?").
 	set("Adam").andMapOne(rs -> new User(rs.getString(1), rs.getString(2)));
