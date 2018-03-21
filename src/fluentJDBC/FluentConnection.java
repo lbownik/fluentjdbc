@@ -294,7 +294,7 @@ public final class FluentConnection {
          try {
             consumer.consume(this.statement);
             return this;
-         } catch (final SQLException e) {
+         } catch (final Exception e) {
             this.statement.close();
             throw e;
          }

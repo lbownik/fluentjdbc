@@ -24,11 +24,10 @@ public class ManipulationUseCases {
 
       using(this.c).prepare("sql").set(13).set(14);
 
-      assertEquals("sql", this.c.s.sql);
       assertEquals(2, this.c.s.arguments.size());
       assertEquals(13, this.c.s.arguments.get(1));
       assertEquals(14, this.c.s.arguments.get(2));
-      assertFalse(this.c.s.isClosed);
+      assertProperInvocationInvariants();
    }
    /***************************************************************************
     * 
@@ -42,10 +41,9 @@ public class ManipulationUseCases {
          using(this.c).prepare("sql").set(13);
          fail();
       } catch (Exception e) {
-         assertEquals("sql", this.c.s.sql);
          assertEquals(1, this.c.s.arguments.size());
          assertEquals(13, this.c.s.arguments.get(1));
-         assertTrue(this.c.s.isClosed);
+         assertFailedInvocationInvariants();
       }
    }
    /***************************************************************************
@@ -57,10 +55,9 @@ public class ManipulationUseCases {
 
       using(this.c).prepare("sql").set((s, index) -> s.setInt(index, 13));
 
-      assertEquals("sql", this.c.s.sql);
       assertEquals(1, this.c.s.arguments.size());
       assertEquals(13, this.c.s.arguments.get(1));
-      assertFalse(this.c.s.isClosed);
+      assertProperInvocationInvariants();
    }
    /***************************************************************************
     * 
@@ -73,8 +70,7 @@ public class ManipulationUseCases {
          using(this.c).prepare("sql").set((FluentConnection.Setter) null);
          fail();
       } catch (NullPointerException e) {
-         assertEquals("sql", this.c.s.sql);
-         assertFalse(this.c.s.isClosed);
+         assertFailedInvocationInvariants();
       } catch (Exception e) {
          fail();
       }
@@ -92,16 +88,15 @@ public class ManipulationUseCases {
          });
          fail();
       } catch (Exception e) {
-         assertEquals("sql", this.c.s.sql);
          assertEquals(0, this.c.s.arguments.size());
-         assertTrue(this.c.s.isClosed);
+         assertFailedInvocationInvariants();
       }
    }
    /***************************************************************************
     * 
     **************************************************************************/
    @Test
-   public void apply_CallsConsumer_ForProperInvocation() 
+   public void apply_CallsConsumer_ForProperInvocation()
            throws Exception {
 
       final AtomicBoolean consumerCalled = new AtomicBoolean();
@@ -109,15 +104,14 @@ public class ManipulationUseCases {
       using(this.c).prepare("sql").apply((s) -> consumerCalled.getAndSet(true));
 
       assertTrue(consumerCalled.get());
-      assertEquals("sql", this.c.s.sql);
       assertEquals(0, this.c.s.arguments.size());
-      assertFalse(this.c.s.isClosed);
+      assertProperInvocationInvariants();
    }
    /***************************************************************************
     * 
     **************************************************************************/
    @Test
-   public void apply_ClosesResources_IfConsumerThrowsException() 
+   public void apply_ClosesResources_IfConsumerThrowsException()
            throws Exception {
 
       try {
@@ -126,10 +120,25 @@ public class ManipulationUseCases {
          });
          fail();
       } catch (SQLException e) {
-         assertEquals("sql", this.c.s.sql);
          assertEquals(0, this.c.s.arguments.size());
-         assertTrue(this.c.s.isClosed);
+         assertFailedInvocationInvariants();
       }
+   }
+   /***************************************************************************
+    * 
+    **************************************************************************/
+   private void assertProperInvocationInvariants() {
+
+      assertEquals("sql", this.c.s.sql);
+      assertFalse(this.c.s.isClosed);
+   }
+   /***************************************************************************
+    * 
+    **************************************************************************/
+   private void assertFailedInvocationInvariants() {
+
+      assertEquals("sql", this.c.s.sql);
+      assertTrue(this.c.s.isClosed);
    }
    /***************************************************************************
     * 
