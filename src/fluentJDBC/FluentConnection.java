@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Optional;
 
 /*******************************************************************************
- *
+ * @see https://github.com/lbownik/fluentjdbc
  * @author lukasz.bownik@gmail.com
  ******************************************************************************/
 public final class FluentConnection {
