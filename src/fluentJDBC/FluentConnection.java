@@ -295,7 +295,12 @@ public final class FluentConnection {
             consumer.consume(this.statement);
             return this;
          } catch (final Exception e) {
-            this.statement.close();
+            try {
+                this.statement.close();
+            } catch(final SQLException ex) {
+                ex.addSuppressed(e);
+                throw ex;
+            }
             throw e;
          }
       }
@@ -304,10 +309,8 @@ public final class FluentConnection {
        **********************************************************************/
       public int andUpdate() throws SQLException {
 
-         try {
-            return this.statement.executeUpdate();
-         } finally {
-            this.statement.close();
+         try (final PreparedStatement s = this.statement) {
+            return s.executeUpdate();
          }
       }
       /***********************************************************************
@@ -315,15 +318,13 @@ public final class FluentConnection {
        **********************************************************************/
       public Object andUpdateReturningKey() throws SQLException {
 
-         try {
-            this.statement.executeUpdate();
-            try (final ResultSet rs = this.statement.getGeneratedKeys()) {
+         try (final PreparedStatement s = this.statement) {
+            s.executeUpdate();
+            try (final ResultSet rs = s.getGeneratedKeys()) {
                rs.next();
                return rs.getObject(1);
             }
-         } finally {
-            this.statement.close();
-         }
+         } 
       }
       /***********************************************************************
        * 
@@ -364,12 +365,12 @@ public final class FluentConnection {
       public <T> T andReduce(T accumulator, final Reducer<T> reducer)
               throws Exception {
 
-         try (final ResultSet rs = this.statement.executeQuery()) {
-            while (rs.next()) {
-               accumulator = reducer.reduce(accumulator, rs);
-            }
-         } finally {
-            this.statement.close();
+         try (final PreparedStatement s = this.statement) {
+            try (final ResultSet rs = s.executeQuery()) {
+                while (rs.next()) {
+                    accumulator = reducer.reduce(accumulator, rs);
+                }
+            } 
          }
          return accumulator;
       }

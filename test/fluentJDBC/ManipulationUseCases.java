@@ -114,13 +114,35 @@ public class ManipulationUseCases {
    public void apply_ClosesResources_IfConsumerThrowsException()
            throws Exception {
 
+      SQLException exception = new SQLException("test");
       try {
          using(this.c).prepare("sql").apply((s) -> {
-            throw new SQLException();
+            throw exception;
          });
          fail();
       } catch (SQLException e) {
          assertEquals(0, this.c.s.arguments.size());
+         assertEquals("test", e.getMessage());
+         assertFailedInvocationInvariants();
+      }
+   }
+      @Test
+   public void apply_ClosesResources_IfConsumerThrowsException_andCloseThrowsException()
+           throws Exception {
+
+      SQLException exception = new SQLException("test");
+      this.c.s.closeThrowsException = true;
+      
+      try {
+         using(this.c).prepare("sql").apply((s) -> {
+            throw exception;
+         });
+         fail();
+      } catch (SQLException e) {
+         assertEquals(0, this.c.s.arguments.size());
+         assertEquals("close", e.getMessage());
+         assertEquals(1, e.getSuppressed().length);
+         assertEquals("test", e.getSuppressed()[0].getMessage());
          assertFailedInvocationInvariants();
       }
    }

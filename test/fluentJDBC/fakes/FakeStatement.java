@@ -59,6 +59,7 @@ public class FakeStatement implements PreparedStatement {
    public boolean executeUpdateThrowsException = false;
    public boolean executeQueryThrowsException = false;
    public boolean setIntThrowsException = false;
+   public boolean closeThrowsException = false;
 
    @Override
    public ResultSet executeQuery() throws SQLException {
@@ -321,8 +322,11 @@ public class FakeStatement implements PreparedStatement {
    }
    @Override
    public void close() throws SQLException {
-
+       
       this.isClosed = true;
+      if(this.closeThrowsException) {
+          throw new SQLException("close");
+      }
    }
    @Override
    public int getMaxFieldSize() throws SQLException {
