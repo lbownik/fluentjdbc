@@ -349,7 +349,8 @@ public final class FluentConnection {
       public <T> Optional<T> andMapOne(final Mapper<T> mapper)
               throws Exception {
 
-         return andReduce(Optional.empty(), (s, rs) -> Optional.of(mapper.map(rs)));
+         return andReduce(Optional.empty(), 
+                 (s, rs) -> Optional.ofNullable(mapper.map(rs)));
       }
       /***********************************************************************
        * 

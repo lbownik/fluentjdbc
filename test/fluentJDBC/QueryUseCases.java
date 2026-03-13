@@ -237,6 +237,16 @@ public class QueryUseCases {
          fail();
       }
    }
+      /***************************************************************************
+    * 
+    **************************************************************************/
+   @Test
+   public void andMapOne_ReturnsEmptyOptional_IfMapperReturnsNull()
+           throws Exception {
+
+      Optional<String> result = using(this.c).prepare("sql").andMapOne(rs -> null);
+      assertTrue(result.isEmpty());
+   }
    /***************************************************************************
     * 
     **************************************************************************/
